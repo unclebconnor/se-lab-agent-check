@@ -61,8 +61,12 @@ class Lab(AgentCheck):
 
 		# steady values of 1 g,c,r
 		for key_name, (metric_name, metric_func) in iteritems(self.STEADY1):
-			metric_func(self, metric_name, 1, tags=tags)
-			counter += 1
+			if "rate" in metric_name:
+				metric_func(self, metric_name, now.second, tags=tags)
+				counter += 1
+			else:
+				metric_func(self, metric_name, 1, tags=tags)
+				counter += 1
 
 		# steady values of 0 g,c,r	
 		for key_name, (metric_name, metric_func) in iteritems(self.STEADY0):
@@ -127,6 +131,8 @@ class Lab(AgentCheck):
 		## - random spikes
 		## - variety of service checks
 		## - some events
+		## - Use min_collection_interval in multiple instances to "offset metrics"
+		## - export a dash to show all of these
      	
   		self.log.info('Sent {} metrics to the agent'.format(counter)) 
 
