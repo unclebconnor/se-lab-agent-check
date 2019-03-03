@@ -1,0 +1,5 @@
+instances:
+  - tags:
+    - breakfast:eggs
+    - lunch:coffee
+    - dinner:chocolate
