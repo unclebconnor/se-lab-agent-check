@@ -62,8 +62,15 @@ class Lab(AgentCheck):
 		'lab.sparse.rate': RATE
 	}
 
-	SINE = {
-		'lab.sine.gauge': GAUGE
+	TRIG = {
+		'lab.sine.gauge': GAUGE,
+		'lab.cosine.gauge': GAUGE
+	}
+
+	SPIKES = {
+		'lab.spikes.gauge': GAUGE,
+		'lab.spikes.count': COUNT,
+		'lab.spikes.rate': RATE
 	}
 		
 	def check(self, instance):
@@ -141,7 +148,8 @@ class Lab(AgentCheck):
 			number = round(minute/10) + 1
 
 			if "rate" in metric_name:
-				metric_func(self, metric_name, seconds_this_hour * (1 + (1/seconds_this_hour)), tags=tags)
+				val = seconds_this_hour * (1 + (1/seconds_this_hour))
+				metric_func(self, metric_name, val, tags=tags)
 			else:
 				metric_func(self, metric_name, number, tags=tags)
 			
@@ -153,8 +161,8 @@ class Lab(AgentCheck):
 			number = round(hour*(1 + minute/60))   
 
 			if "rate" in metric_name:
-				val = hour * minute * second
-				metric_func(self, metric_name, seconds_this_day * (1 + (1/seconds_this_day)), tags=tags)
+				val = seconds_this_day * (1 + (1/seconds_this_day))
+				metric_func(self, metric_name, val, tags=tags)
 			else:
 				metric_func(self, metric_name, number, tags=tags)
 			
@@ -166,7 +174,8 @@ class Lab(AgentCheck):
 			number = round(day * (1 + hour/24))
  
 			if "rate" in metric_name:
-				metric_func(self, metric_name, seconds_this_week * (1 + (1/seconds_this_week)), tags=tags)
+				seconds_this_week * (1 + (1/seconds_this_week))
+				metric_func(self, metric_name, val, tags=tags)
 			else:
 				metric_func(self, metric_name, number, tags=tags)
 			
@@ -180,9 +189,20 @@ class Lab(AgentCheck):
 				counter += 1
 
 		# just a sine function
-		for metric_name, metric_func in self.SINE.iteritems():
-			number = math.sin(seconds_this_month)
-			metric_func(self, metric_name, number, tags=tags)
+		for metric_name, metric_func in self.TRIG.iteritems():
+			val = 100 * math.sin(seconds_this_month / 300) + 100
+			metric_func(self, metric_name, val, tags=tags)
+			counter += 1
+
+		# occasional spikes
+		for metric_name, metric_func in self.SPIKES.iteritems():
+			val = random.random() * 2
+
+			if hour % 7 == 0 and minute % 9 == 0:
+				val = hour * minute
+			
+			metric_func(self, metric_name, val, tags=tags)
+			
 			counter += 1
 
 		## ======= SERVICE CHECKS ==========
@@ -200,10 +220,8 @@ class Lab(AgentCheck):
 			self.service_check(sometimes_red_name, sometimes_red_status, tags=tags, message="Sometimes Red")
 			self.log.debug('Service Check {} has status {}'.format(sometimes_red_name, sometimes_red_status))
 
-		## to add
-		## - wave patterns - maybe use seconds to draw sin wav	
+		## to add	
 		## - other metric types
-		## - random spikes
 		## - some events
 		## - Use min_collection_interval in multiple instances to "offset metrics"
      	
