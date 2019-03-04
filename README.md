@@ -15,6 +15,11 @@ instances:
     - breakfast:eggs
     - lunch:coffee
     - dinner:chocolate
+
+  - tags:
+    - breakfast:cereal
+    - lunch:salad
+    - dinner:steak
 ```
 
 ## Metrics
@@ -26,8 +31,23 @@ lab.steady1.<metric_type>
 lab.steady0.<metric_type>
 lab.rand10.<metric_type>
 lab.randfract.<metric_type>
-lab.increase_cycle.<metric_type>
+lab.increase_hourly_cycle.<metric_type>
+lab.increase_daily_cycle.<metric_type>
+lab.increase_weekly_cycle.<metric_type>
 lab.sparse.<metric_type>
+lab.sine.gauge #gauge only
+lab.spikes.<metric_type>
 ```
+
+## Service Checks
+
+`lab.is_up`
+
+-   Will be OK status while check is running
+
+`lab.crit_every_10`
+
+-   Will be mostly OK while check is running
+-   Will send CRITICAL if the current minute is a multiple of 10
 
 ...more coming soon

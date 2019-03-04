@@ -64,7 +64,6 @@ class Lab(AgentCheck):
 
 	TRIG = {
 		'lab.sine.gauge': GAUGE,
-		'lab.cosine.gauge': GAUGE
 	}
 
 	SPIKES = {
