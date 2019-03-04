@@ -49,9 +49,7 @@ class Lab(AgentCheck):
 		'lab.sparse.count': COUNT,
 		'lab.sparse.rate': RATE
 	}
-
 		
-
 	def check(self, instance):
 		tags = instance.get('tags',[])
 		counter = 0 # for the log
@@ -124,17 +122,32 @@ class Lab(AgentCheck):
 			number = now.minute
 			if number % 30 <= 5:
 				metric_func(self, metric_name, number, tags=tags)
-				counter += 1	
+				counter += 1
+
+		## ======= SERVICE CHECKS ==========
+		if True:
+			heartbeat_name = 'lab.is_up'
+			heartbeat_status = 0
+			self.service_check(heartbeat_name, heartbeat_status, tags=tags, message="Everything is OK")
+			self.log.debug('Service Check {} has status {}'.format(heartbeat_name, heartbeat_status))
+
+		if True:
+			sometimes_red_name = 'lab.crit_every_10'
+			sometimes_red_status = 0
+			if now.minute % 10 == 0:
+				sometimes_red_status = 2
+			self.service_check(sometimes_red_name, sometimes_red_status, tags=tags, message="Sometimes Red")
+			self.log.debug('Service Check {} has status {}'.format(sometimes_red_name, sometimes_red_status))
 
 		## to add
 		## - long term patterns for anomaly seasonality
 		## - wave patterns - maybe use seconds to draw sin wav	
 		## - random spikes
-		## - variety of service checks
 		## - some events
 		## - Use min_collection_interval in multiple instances to "offset metrics"
 		## - export a dash to show all of these
      	
+     	## confirmation in agent log
   		self.log.info('Sent {} metrics to the agent'.format(counter)) 
 
 
