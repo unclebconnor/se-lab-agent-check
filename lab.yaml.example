@@ -3,3 +3,8 @@ instances:
     - breakfast:eggs
     - lunch:coffee
     - dinner:chocolate
+    
+#   - tags:
+#     - breakfast:cereal
+#     - lunch:salad
+#     - dinner:steak

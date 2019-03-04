@@ -190,7 +190,7 @@ class Lab(AgentCheck):
 
 		# just a sine function
 		for metric_name, metric_func in self.TRIG.iteritems():
-			val = 100 * math.sin(seconds_this_month / 300) + 100
+			val = 100 * math.sin(seconds_this_month / 100) + 100
 			metric_func(self, metric_name, val, tags=tags)
 			counter += 1
 
@@ -198,7 +198,7 @@ class Lab(AgentCheck):
 		for metric_name, metric_func in self.SPIKES.iteritems():
 			val = random.random() * 2
 
-			if hour % 7 == 0 and minute % 9 == 0:
+			if hour % 2 == 0 and minute % 7 == 0:
 				val = hour * minute
 			
 			metric_func(self, metric_name, val, tags=tags)
@@ -206,19 +206,17 @@ class Lab(AgentCheck):
 			counter += 1
 
 		## ======= SERVICE CHECKS ==========
-		if True:
-			heartbeat_name = 'lab.is_up'
-			heartbeat_status = 0
-			self.service_check(heartbeat_name, heartbeat_status, tags=tags, message="Everything is OK")
-			self.log.debug('Service Check {} has status {}'.format(heartbeat_name, heartbeat_status))
+		heartbeat_name = 'lab.is_up'
+		heartbeat_status = 0
+		self.service_check(heartbeat_name, heartbeat_status, tags=tags, message="Everything is OK")
+		self.log.debug('Service Check {} has status {}'.format(heartbeat_name, heartbeat_status))
 
-		if True:
-			sometimes_red_name = 'lab.crit_every_10'
-			sometimes_red_status = 0
-			if now.minute % 10 == 0:
-				sometimes_red_status = 2
-			self.service_check(sometimes_red_name, sometimes_red_status, tags=tags, message="Sometimes Red")
-			self.log.debug('Service Check {} has status {}'.format(sometimes_red_name, sometimes_red_status))
+		sometimes_red_name = 'lab.crit_every_10'
+		sometimes_red_status = 0
+		if now.minute % 10 == 0:
+			sometimes_red_status = 2
+		self.service_check(sometimes_red_name, sometimes_red_status, tags=tags, message="Sometimes Red")
+		self.log.debug('Service Check {} has status {}'.format(sometimes_red_name, sometimes_red_status))
 
 		## to add	
 		## - other metric types
