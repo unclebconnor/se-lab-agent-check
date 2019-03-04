@@ -1,7 +1,7 @@
 #Agent 6 required
 from datadog_checks.checks import AgentCheck
 
-import random, datetime
+import random, datetime, math
 
 # content of the special variable __version__ will be shown in the Agent status page
 __version__ = "1.0.0"
@@ -38,10 +38,22 @@ class Lab(AgentCheck):
 		'lab.randfract.rate': RATE 
 	}
 
-	INCREASE_CYCLE = {
-		'lab.increase_cycle.gauge': GAUGE,
-		'lab.increase_cycle.count': COUNT,
-		'lab.increase_cycle.rate': RATE
+	INCREASE_HOURLY_CYCLE = {
+		'lab.increase_hourly_cycle.gauge': GAUGE,
+		'lab.increase_hourly_cycle.count': COUNT,
+		'lab.increase_hourly_cycle.rate': RATE
+	}
+
+	INCREASE_DAILY_CYCLE = {
+		'lab.increase_daily_cycle.gauge': GAUGE,
+		'lab.increase_daily_cycle.count': COUNT,
+		'lab.increase_daily_cycle.rate': RATE
+	}
+
+	INCREASE_WEEKLY_CYCLE = {
+		'lab.increase_WEEKLY_cycle.gauge': GAUGE,
+		'lab.increase_WEEKLY_cycle.count': COUNT,
+		'lab.increase_WEEKLY_cycle.rate': RATE
 	}
 
 	SPARSE = {
@@ -49,23 +61,46 @@ class Lab(AgentCheck):
 		'lab.sparse.count': COUNT,
 		'lab.sparse.rate': RATE
 	}
+
+	SINE = {
+		'lab.sine.gauge': GAUGE
+	}
 		
 	def check(self, instance):
 		tags = instance.get('tags',[])
 		counter = 0 # for the log
 
-		# some helpers
+		# some time helpers
 		now = datetime.datetime.now()
-		month_start = datetime.datetime(now.year,now.month,1)
+		weekday = now.weekday() #0 - 6
+		year = now.year
+		month = now.month
+		day = now.day
+		hour = now.hour
+		minute = now.minute
+		second = now.second 
+		month_start = datetime.datetime(year,month,1)
+		day_start = datetime.datetime(year,month,day)
+		hour_start = datetime.datetime(year,month,day,hour)
+		minute_start = datetime.datetime(year,month,day,hour)
+		this_second = datetime.datetime(year,month,day,hour,second)
+
+		seconds_this_month = (now - month_start).total_seconds()
+		seconds_this_week = (now - day_start).total_seconds() + weekday * 86400
+		seconds_this_day = (now - day_start).total_seconds()
+		seconds_this_hour =  (now - hour_start).total_seconds()
+		
+		week_start = now - datetime.timedelta(seconds = seconds_this_week)
+		
 
 		# steady values of 1 g,c,r
 		for metric_name, metric_func in self.STEADY1.iteritems():
 			if "rate" in metric_name:
-				metric_func(self, metric_name, now.second, tags=tags)
-				counter += 1
+				metric_func(self, metric_name, second, tags=tags)
 			else:
 				metric_func(self, metric_name, 1, tags=tags)
-				counter += 1
+			
+			counter += 1
 
 		# steady values of 0 g,c,r		
 		for metric_name, metric_func in self.STEADY0.iteritems():
@@ -76,15 +111,15 @@ class Lab(AgentCheck):
 		# range will change with different min_collection_interval
 		# rate will likely spike if you restart the agent and at the start of the month	
 		for metric_name, metric_func in self.RAND_10.iteritems():
-			rand_10 = random.random()*10
+			rand_10 = random.random() * 10
 
 			if "rate" in metric_name:
-				val = ((now - month_start).total_seconds() + rand_10) * 20/3
+				val = (seconds_this_day + rand_10) * 20/3
 				metric_func(self, metric_name, val, tags=tags)
-				counter += 1
 			else:
 				metric_func(self, metric_name, rand_10, tags=tags)
-				counter += 1
+			
+			counter += 1
 
 		# random values between 0 - 1 for g,c,r
 		# range will change with different min_collection_interval
@@ -93,36 +128,62 @@ class Lab(AgentCheck):
 			rand_fract = random.random()
 
 			if "rate" in metric_name:
-				val = ((now - month_start).total_seconds() + rand_fract) * 2/3
+				val = (seconds_this_day + rand_fract * 10) * 2/3
 				metric_func(self, metric_name, val, tags=tags)
-				counter += 1
 			else:
 				metric_func(self, metric_name, rand_fract, tags=tags)
-				counter += 1
+			
+			counter += 1
 
-		# generally increasing trends over time
+		# generally increasing trends over an hour
 		# shapes will vary
-		for metric_name, metric_func in self.INCREASE_CYCLE.iteritems():
-			number = round(now.minute/10)
-			hour = now.hour if now.hour != 0 else 1
-			minute = now.minute if now.minute != 0 else 1
-			second = now.second if now.second != 0 else 1   
+		for metric_name, metric_func in self.INCREASE_HOURLY_CYCLE.iteritems():
+			number = round(minute/10) + 1
+
+			if "rate" in metric_name:
+				metric_func(self, metric_name, seconds_this_hour * (1 + (1/seconds_this_hour)), tags=tags)
+			else:
+				metric_func(self, metric_name, number, tags=tags)
+			
+			counter += 1
+
+		# generally increasing trends over a day
+		# shapes will vary
+		for metric_name, metric_func in self.INCREASE_DAILY_CYCLE.iteritems():
+			number = round(hour*(1 + minute/60))   
 
 			if "rate" in metric_name:
 				val = hour * minute * second
-				metric_func(self, metric_name, val, tags=tags)
-				counter += 1
+				metric_func(self, metric_name, seconds_this_day * (1 + (1/seconds_this_day)), tags=tags)
 			else:
 				metric_func(self, metric_name, number, tags=tags)
-				counter += 1
+			
+			counter += 1
 
+		# generally increasing trends over a week
+		# shapes will vary
+		for metric_name, metric_func in self.INCREASE_WEEKLY_CYCLE.iteritems():
+			number = round(day * (1 + hour/24))
+ 
+			if "rate" in metric_name:
+				metric_func(self, metric_name, seconds_this_week * (1 + (1/seconds_this_week)), tags=tags)
+			else:
+				metric_func(self, metric_name, number, tags=tags)
+			
+			counter += 1
 
-		# sparese metrics should show every half hour for about 5 min
+		# sparse metrics should show every half hour for about 5 min
 		for metric_name, metric_func in self.SPARSE.iteritems():
 			number = now.minute
 			if number % 30 <= 5:
 				metric_func(self, metric_name, number, tags=tags)
 				counter += 1
+
+		# just a sine function
+		for metric_name, metric_func in self.SINE.iteritems():
+			number = math.sin(seconds_this_month)
+			metric_func(self, metric_name, number, tags=tags)
+			counter += 1
 
 		## ======= SERVICE CHECKS ==========
 		if True:
@@ -140,12 +201,11 @@ class Lab(AgentCheck):
 			self.log.debug('Service Check {} has status {}'.format(sometimes_red_name, sometimes_red_status))
 
 		## to add
-		## - long term patterns for anomaly seasonality
 		## - wave patterns - maybe use seconds to draw sin wav	
+		## - other metric types
 		## - random spikes
 		## - some events
 		## - Use min_collection_interval in multiple instances to "offset metrics"
-		## - export a dash to show all of these
      	
      	## confirmation in agent log
   		self.log.info('Sent {} metrics to the agent'.format(counter)) 
