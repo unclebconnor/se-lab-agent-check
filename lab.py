@@ -1,7 +1,6 @@
 #Agent 6 required
 from datadog_checks.checks import AgentCheck
 
-from six import iteritems
 import random, datetime
 
 # content of the special variable __version__ will be shown in the Agent status page
@@ -9,44 +8,46 @@ __version__ = "1.0.0"
 
 
 class Lab(AgentCheck):
+	# Metric Functions
 	GAUGE = AgentCheck.gauge
 	COUNT = AgentCheck.count
 	RATE = AgentCheck.rate
 
+	# Metrics
 	STEADY1 = {
-		'steady_gauge_1': ('lab.steady1.gauge', GAUGE),
-		'steady_count_1': ('lab.steady1.count', COUNT),
-		'steady_rate_1': ('lab.steady1.rate', RATE)
+		'lab.steady1.gauge': GAUGE,
+		'lab.steady1.count': COUNT,
+		'lab.steady1.rate': RATE
 	}
 
 	STEADY0 = {
-		'steady_gauge_0': ('lab.steady0.gauge', GAUGE),
-		'steady_count_0': ('lab.steady0.count', COUNT),
-		'steady_rate_0': ('lab.steady0.rate', RATE)
+		'lab.steady0.gauge': GAUGE,
+		'lab.steady0.count': COUNT,
+		'lab.steady0.rate': RATE
 	}
 
 	RAND_10 = {
-		'rand_gauge_10': ('lab.rand10.gauge', GAUGE),
-		'rand_count_10': ('lab.rand10.count', COUNT),
-		'rand_rate_10': ('lab.rand10.rate', RATE) 
+		'lab.rand10.gauge': GAUGE,
+		'lab.rand10.count': COUNT,
+		'lab.rand10.rate': RATE 
 	}
 
 	RAND_FRACT = {
-		'rand_gauge_fract': ('lab.randfract.gauge', GAUGE),
-		'rand_count_fract': ('lab.randfract.count', COUNT),
-		'rand_rate_fract': ('lab.randfract.rate', RATE) 
+		'lab.randfract.gauge': GAUGE,
+		'lab.randfract.count': COUNT,
+		'lab.randfract.rate': RATE 
 	}
 
 	INCREASE_CYCLE = {
-		'increase_cycle_gauge': ('lab.increase_cycle.gauge', GAUGE),
-		'increase_cycle_count': ('lab.increase_cycle.count', COUNT),
-		'increase_cycle_rate': ('lab.increase_cycle.rate', RATE)
+		'lab.increase_cycle.gauge': GAUGE,
+		'lab.increase_cycle.count': COUNT,
+		'lab.increase_cycle.rate': RATE
 	}
 
 	SPARSE = {
-		'sparse_gauge': ('lab.sparse.gauge', GAUGE),
-		'sparse_count': ('lab.sparse.count', COUNT),
-		'sparse_rate': ('lab.sparse.rate', RATE)
+		'lab.sparse.gauge': GAUGE,
+		'lab.sparse.count': COUNT,
+		'lab.sparse.rate': RATE
 	}
 
 		
@@ -60,7 +61,7 @@ class Lab(AgentCheck):
 		month_start = datetime.datetime(now.year,now.month,1)
 
 		# steady values of 1 g,c,r
-		for key_name, (metric_name, metric_func) in iteritems(self.STEADY1):
+		for metric_name, metric_func in self.STEADY1.iteritems():
 			if "rate" in metric_name:
 				metric_func(self, metric_name, now.second, tags=tags)
 				counter += 1
@@ -68,15 +69,15 @@ class Lab(AgentCheck):
 				metric_func(self, metric_name, 1, tags=tags)
 				counter += 1
 
-		# steady values of 0 g,c,r	
-		for key_name, (metric_name, metric_func) in iteritems(self.STEADY0):
+		# steady values of 0 g,c,r		
+		for metric_name, metric_func in self.STEADY0.iteritems():
 			metric_func(self, metric_name, 0, tags=tags)
 			counter += 1
 
 		# random values between 1 - 10 for g,c,r
 		# range will change with different min_collection_interval
 		# rate will likely spike if you restart the agent and at the start of the month	
-		for key_name, (metric_name, metric_func) in iteritems(self.RAND_10):
+		for metric_name, metric_func in self.RAND_10.iteritems():
 			rand_10 = random.random()*10
 
 			if "rate" in metric_name:
@@ -90,7 +91,7 @@ class Lab(AgentCheck):
 		# random values between 0 - 1 for g,c,r
 		# range will change with different min_collection_interval
 		# rate will likely spike if you restart the agent and at the start of the month		
-		for key_name, (metric_name, metric_func) in iteritems(self.RAND_FRACT):
+		for metric_name, metric_func in self.RAND_FRACT.iteritems():
 			rand_fract = random.random()
 
 			if "rate" in metric_name:
@@ -103,7 +104,7 @@ class Lab(AgentCheck):
 
 		# generally increasing trends over time
 		# shapes will vary
-		for key_name, (metric_name, metric_func) in iteritems(self.INCREASE_CYCLE):
+		for metric_name, metric_func in self.INCREASE_CYCLE.iteritems():
 			number = round(now.minute/10)
 			hour = now.hour if now.hour != 0 else 1
 			minute = now.minute if now.minute != 0 else 1
@@ -119,7 +120,7 @@ class Lab(AgentCheck):
 
 
 		# sparese metrics should show every half hour for about 5 min
-		for key_name, (metric_name, metric_func) in iteritems(self.SPARSE):
+		for metric_name, metric_func in self.SPARSE.iteritems():
 			number = now.minute
 			if number % 30 <= 5:
 				metric_func(self, metric_name, number, tags=tags)
