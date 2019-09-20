@@ -23,9 +23,9 @@ instances:
     send_events: True # default False
     event_title: 'Title of Event'
     event_text: 'Body of Event'
-    event_alert_level
-    event_source_type_name
-    event_priority
+    event_alert_level: 'info'
+    event_source_type_name: 'lab'
+    event_priority: 'normal'
 
 ```
 
