@@ -7,7 +7,7 @@ This check will produce a variety of metrics that you can use to test the behavi
 ## Setup
 
 -   add this `lab.py` file to `checks.d/` and add a `lab.yaml` to `conf.d/`
--   Add 1 or more instances in the yaml file and specify tags (only option for now):
+-   Add 1 or more instances in the yaml file and specify tags or event settings:
 
 ```
 instances:
