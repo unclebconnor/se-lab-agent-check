@@ -3,8 +3,15 @@ instances:
     - breakfast:eggs
     - lunch:coffee
     - dinner:chocolate
-    
+
 #   - tags:
 #     - breakfast:cereal
 #     - lunch:salad
 #     - dinner:steak
+#     min_collection_interval: 20
+#     send_events: True # default False
+#     event_title: 'Title of Event'
+#     event_text: 'Body of Event'
+#     event_alert_level: 'info'  # 'error', 'warning', 'success', or 'info'
+#     event_source_type_name: 'lab'
+#     event_priority: 'normal' # 'normal' or 'low'
