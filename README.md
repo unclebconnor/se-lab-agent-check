@@ -20,12 +20,6 @@ instances:
     - breakfast:cereal
     - lunch:salad
     - dinner:steak
-    send_events: True # default False
-    event_title: 'Title of Event'
-    event_text: 'Body of Event'
-    event_alert_level: 'info'
-    event_source_type_name: 'lab'
-    event_priority: 'normal'
 
 ```
 
@@ -56,5 +50,24 @@ lab.spikes.<metric_type>
 
 -   Will be mostly OK while check is running
 -   Will send CRITICAL if the current minute is a multiple of 10
+
+## Events
+
+You can add events with the following configs.  They will inherit the tags for their respective instance:
+
+```
+instances:
+  - tags:
+    - breakfast:cereal
+    - lunch:salad
+    - dinner:steak
+    send_events: True # default False
+    event_title: 'Title of Event'
+    event_text: 'Body of Event'
+    event_alert_level: 'info'
+    event_source_type_name: 'lab'
+    event_priority: 'normal'
+
+```
 
 ...more coming soon
