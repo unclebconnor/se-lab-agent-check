@@ -20,7 +20,7 @@ instances:
     - breakfast:cereal
     - lunch:salad
     - dinner:steak
-
+    min_collection_interval: 30
 ```
 
 ## Metrics
@@ -67,7 +67,6 @@ instances:
     event_alert_level: 'info'
     event_source_type_name: 'lab'
     event_priority: 'normal'
-
 ```
 
 ...more coming soon
