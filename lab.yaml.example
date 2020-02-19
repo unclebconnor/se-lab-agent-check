@@ -10,8 +10,9 @@ instances:
 #     - dinner:steak
 #     min_collection_interval: 20
 #     send_events: True # default False
-#     event_title: 'Title of Event'
-#     event_text: 'Body of Event'
-#     event_alert_level: 'info'  # 'error', 'warning', 'success', or 'info'
-#     event_source_type_name: 'lab'
-#     event_priority: 'normal' # 'normal' or 'low'
+#     event:
+#       title: 'Title of Event'
+#       text: 'Body of Event'
+#       alert_level: 'info'  # 'error', 'warning', 'success', or 'info'
+#       source_type_name: 'lab'
+#       priority: 'normal' # 'normal' or 'low'

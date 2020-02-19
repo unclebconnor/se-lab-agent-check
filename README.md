@@ -1,6 +1,6 @@
 # se-lab-agent-check
 
-## This will be useful for some tasks
+## This will be useful for observing metric behaviors and reproducing some monitor issues
 
 This check will produce a variety of metrics that you can use to test the behaviors of metrics in monitors and dashboards. You can also make adjustments and break stuff to learn more about the different types of metrics.
 
@@ -62,11 +62,11 @@ instances:
     - lunch:salad
     - dinner:steak
     send_events: True # default False
-    event_title: 'Title of Event'
-    event_text: 'Body of Event'
-    event_alert_level: 'info'
-    event_source_type_name: 'lab'
-    event_priority: 'normal'
+    event:
+      title: 'Title of Event'
+      text: 'Body of Event'
+      alert_level: 'info'
+      source_type_name: 'lab'
+      priority: 'normal'
 ```
 
-...more coming soon
